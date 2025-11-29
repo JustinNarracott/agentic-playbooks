@@ -719,6 +719,5 @@ async def test_company_enricher_success(mock_clearbit_response):
 
 The Agentic Playbooks framework provides a flexible, extensible architecture for building governed AI agent systems. By following the Skills > Playbooks > Traces pattern, you can create complex, auditable workflows with transparency and control.
 
-For more examples and detailed API documentation, see:
-- [Skills Reference](skills-reference.md)
-- [API Documentation](api.md)
+For more information, see:
+- [Skills Reference](skills.md) - Complete reference for all built-in skills

@@ -45,9 +45,6 @@ docker-compose up -d
 
 # Run tests
 docker exec -it playbooks-workspace pytest
-
-# Run an example
-docker exec -it playbooks-workspace python -m examples.ai_decision_audit_demo
 ```
 
 ---
@@ -61,10 +58,8 @@ agentic-playbooks/
 │   ├── skills/         # Skill base classes and registry
 │   └── modules/        # Domain-specific modules
 ├── playbooks/          # YAML playbook definitions
-├── skills/             # YAML skill definitions
 ├── tests/              # Unit and integration tests
-├── docs/               # Documentation
-└── examples/           # Demo scripts
+└── docs/               # Documentation
 ```
 
 ---
@@ -202,10 +197,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📖 Documentation
 
-- [Architecture](docs/architecture.md)
-- [Skills Reference](docs/skills.md)
-- [Playbooks Reference](docs/playbooks.md)
-- [Examples](docs/examples.md)
+- [Architecture](docs/architecture.md) - Framework design and patterns
+- [Skills Reference](docs/skills.md) - Complete skills reference
 
 ---
 
