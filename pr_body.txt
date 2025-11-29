@@ -1,0 +1,47 @@
+## Summary
+Implements batch execution support with parallel processing, progress tracking, and result aggregation.
+
+## Related Issue
+Closes #24
+
+## Changes
+- Created `BatchExecutor` class (`src/playbooks/batch.py`):
+  - Parallel execution with configurable concurrency (asyncio.Semaphore)
+  - Progress tracking with live updates during execution
+  - Continue-on-error mode (default: true)
+  - Individual execution timing metrics
+
+- Created `BatchResult` class:
+  - Captures individual playbook execution results
+  - Tracks success/failure status, duration, errors
+  - Preserves input context and execution trace
+  - Serialization support (to_dict)
+
+- Created `BatchResults` class:
+  - Aggregates results with statistics
+  - Properties: total, success_count, failure_count, avg_duration_ms
+  - Export to JSON format (to_json)
+  - Export to CSV format (to_csv)
+
+- CLI tool (`python -m src.playbooks.batch`):
+  - Batch execution from JSON inputs file
+  - --max-concurrency: Control parallel execution limit
+  - --progress: Show live progress updates
+  - --stop-on-error: Stop on first failure
+  - --output: Export results to JSON/CSV
+  - Exit code: 0 for all success, 1 if any failures
+
+- Updated `src/playbooks/__init__.py`:
+  - Export BatchExecutor, BatchResult, BatchResults
+
+- Comprehensive unit tests (`tests/unit/test_batch.py`):
+  - 19 test cases covering all functionality
+  - 69% coverage on batch module
+
+## Testing
+- [x] Unit tests added (19 tests)
+- [x] All tests pass (194 tests total)
+- [x] 84% code coverage (exceeds 80% requirement)
+- [x] All linters pass
+
+Ready for review!

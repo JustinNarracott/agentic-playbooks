@@ -1,5 +1,6 @@
 """PlaybookEngine - executes playbooks with skills and decision logic."""
 
+import time
 import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -15,6 +16,7 @@ from .errors import (
     SkillNotFoundError,
     TemplateError,
 )
+from .metrics import MetricsCollector
 from .models import DecisionStep, Playbook, SkillStep, Step
 from .tracer import ExecutionTrace, StepTrace
 
@@ -178,15 +180,21 @@ class PlaybookEngine:
     - Generating comprehensive execution traces
     """
 
-    def __init__(self, skill_registry: Optional[SkillRegistry] = None) -> None:
+    def __init__(
+        self,
+        skill_registry: Optional[SkillRegistry] = None,
+        metrics: Optional[MetricsCollector] = None,
+    ) -> None:
         """
         Initialize the PlaybookEngine.
 
         Args:
             skill_registry: Optional SkillRegistry instance. If not provided,
                           uses the global singleton instance.
+            metrics: Optional MetricsCollector for tracking execution metrics
         """
         self.skill_registry = skill_registry or SkillRegistry.get_instance()
+        self.metrics = metrics
 
     async def execute(
         self,
@@ -235,6 +243,9 @@ class PlaybookEngine:
             context = ExecutionContext(context_vars)
             start_step = 0
 
+        # Track playbook execution start time
+        playbook_start = time.perf_counter()
+
         try:
             # Execute steps (starting from checkpoint if resuming)
             for i, step in enumerate(playbook.steps[start_step:], start=start_step):
@@ -252,6 +263,21 @@ class PlaybookEngine:
 
             trace.success = True
 
+            # Track successful playbook execution
+            if self.metrics:
+                duration = time.perf_counter() - playbook_start
+                self.metrics.increment_counter(
+                    "playbook_executions_total",
+                    {"playbook": playbook.metadata.name, "status": "success"},
+                    help_text="Total playbook executions",
+                )
+                self.metrics.observe_histogram(
+                    "playbook_duration_seconds",
+                    duration,
+                    {"playbook": playbook.metadata.name},
+                    help_text="Playbook execution duration",
+                )
+
             # Clean up checkpoint on successful completion
             if checkpoint_manager:
                 checkpoint_manager.delete_checkpoint(execution_id)
@@ -259,6 +285,21 @@ class PlaybookEngine:
         except Exception as e:
             trace.error = str(e)
             trace.success = False
+
+            # Track failed playbook execution
+            if self.metrics:
+                duration = time.perf_counter() - playbook_start
+                self.metrics.increment_counter(
+                    "playbook_executions_total",
+                    {"playbook": playbook.metadata.name, "status": "failure"},
+                    help_text="Total playbook executions",
+                )
+                self.metrics.observe_histogram(
+                    "playbook_duration_seconds",
+                    duration,
+                    {"playbook": playbook.metadata.name},
+                    help_text="Playbook execution duration",
+                )
 
             # Provide helpful message about resuming from checkpoint
             if checkpoint_manager:
@@ -363,6 +404,9 @@ class PlaybookEngine:
         )
         traces.append(step_trace)
 
+        # Track skill execution start time
+        skill_start = time.perf_counter()
+
         try:
             # Get skill from registry
             skill_class = self.skill_registry.get(step.skill)
@@ -394,15 +438,54 @@ class PlaybookEngine:
                 (step_trace.completed_at - step_trace.started_at).total_seconds() * 1000
             )
 
+            # Track successful skill execution
+            if self.metrics:
+                duration = time.perf_counter() - skill_start
+                self.metrics.increment_counter(
+                    "skill_executions_total",
+                    {"skill": step.skill, "status": "success"},
+                    help_text="Total skill executions",
+                )
+                self.metrics.observe_histogram(
+                    "skill_duration_seconds",
+                    duration,
+                    {"skill": step.skill},
+                    help_text="Skill execution duration",
+                )
+
         except SkillNotFoundError:
             # Re-raise SkillNotFoundError as-is
             step_trace.error = "Skill not found"
             step_trace.completed_at = datetime.utcnow()
+
+            # Track skill not found
+            if self.metrics:
+                self.metrics.increment_counter(
+                    "skill_executions_total",
+                    {"skill": step.skill, "status": "not_found"},
+                    help_text="Total skill executions",
+                )
+
             raise
         except Exception as e:
             # Wrap other exceptions in SkillExecutionError
             step_trace.error = str(e)
             step_trace.completed_at = datetime.utcnow()
+
+            # Track failed skill execution
+            if self.metrics:
+                duration = time.perf_counter() - skill_start
+                self.metrics.increment_counter(
+                    "skill_executions_total",
+                    {"skill": step.skill, "status": "failure"},
+                    help_text="Total skill executions",
+                )
+                self.metrics.observe_histogram(
+                    "skill_duration_seconds",
+                    duration,
+                    {"skill": step.skill},
+                    help_text="Skill execution duration",
+                )
 
             # Extract reasoning from skill trace if available
             reasoning = None
@@ -444,6 +527,15 @@ class PlaybookEngine:
             for i, branch in enumerate(step.branches):
                 if context.evaluate_condition(branch.condition, step_name=step.name):
                     step_trace.decision_taken = f"branch_{i}: {branch.condition}"
+
+                    # Track decision branch taken
+                    if self.metrics:
+                        self.metrics.increment_counter(
+                            "decision_branches_taken_total",
+                            {"step": step.name, "branch": f"branch_{i}"},
+                            help_text="Total decision branches taken",
+                        )
+
                     # Execute branch steps
                     for branch_step in branch.steps:
                         await self._execute_step(
@@ -455,6 +547,15 @@ class PlaybookEngine:
             # Execute default if no branch matched
             if not branch_taken and step.default:
                 step_trace.decision_taken = "default"
+
+                # Track default branch taken
+                if self.metrics:
+                    self.metrics.increment_counter(
+                        "decision_branches_taken_total",
+                        {"step": step.name, "branch": "default"},
+                        help_text="Total decision branches taken",
+                    )
+
                 for default_step in step.default:
                     await self._execute_step(
                         default_step, context, step_trace.nested_steps

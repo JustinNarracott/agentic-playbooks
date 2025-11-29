@@ -12,6 +12,7 @@ from .errors import (
     TemplateError,
 )
 from .loader import PlaybookLoader, PlaybookLoadError
+from .metrics import MetricsCollector, PrometheusExporter, StatsDExporter
 from .models import (
     DecisionBranch,
     DecisionStep,
@@ -54,4 +55,7 @@ __all__ = [
     "BatchExecutor",
     "BatchResult",
     "BatchResults",
+    "MetricsCollector",
+    "PrometheusExporter",
+    "StatsDExporter",
 ]

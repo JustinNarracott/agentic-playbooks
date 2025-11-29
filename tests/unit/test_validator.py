@@ -140,9 +140,7 @@ class TestPlaybookValidator:
         # Don't register any skills
 
         playbook = Playbook(
-            metadata=PlaybookMetadata(
-                name="test", version="1.0.0", description="Test"
-            ),
+            metadata=PlaybookMetadata(name="test", version="1.0.0", description="Test"),
             steps=[
                 SkillStep(
                     name="test_step",

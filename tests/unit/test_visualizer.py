@@ -1,6 +1,5 @@
 """Unit tests for PlaybookVisualizer."""
 
-
 from src.playbooks import (
     DecisionBranch,
     DecisionStep,
