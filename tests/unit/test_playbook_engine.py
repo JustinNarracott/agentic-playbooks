@@ -7,7 +7,6 @@ import pytest
 from src.playbooks.engine import (
     ExecutionContext,
     PlaybookEngine,
-    PlaybookExecutionError,
 )
 from src.playbooks.models import (
     DecisionBranch,
@@ -120,8 +119,10 @@ class TestExecutionContext:
 
     def test_evaluate_condition_invalid_syntax(self) -> None:
         """Test invalid condition syntax."""
+        from src.playbooks.errors import TemplateError
+
         context = ExecutionContext()
-        with pytest.raises(PlaybookExecutionError, match="Invalid condition syntax"):
+        with pytest.raises(TemplateError):
             context.evaluate_condition("{{ invalid")
 
     def test_render_template(self) -> None:
@@ -390,7 +391,9 @@ class TestPlaybookEngine:
             ],
         )
 
-        with pytest.raises(PlaybookExecutionError, match="Skill not found"):
+        from src.playbooks.errors import SkillNotFoundError
+
+        with pytest.raises(SkillNotFoundError):
             await engine.execute(playbook)
 
     @pytest.mark.asyncio
@@ -407,7 +410,9 @@ class TestPlaybookEngine:
             ],
         )
 
-        with pytest.raises(PlaybookExecutionError, match="Playbook execution failed"):
+        from src.playbooks.errors import SkillExecutionError
+
+        with pytest.raises(SkillExecutionError):
             await engine.execute(playbook)
 
     @pytest.mark.asyncio

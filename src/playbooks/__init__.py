@@ -1,6 +1,15 @@
 """Playbook engine - core execution logic."""
 
-from .engine import ExecutionContext, PlaybookEngine, PlaybookExecutionError
+from .checkpoint import CheckpointManager
+from .engine import ExecutionContext, PlaybookEngine
+from .errors import (
+    CheckpointError,
+    InvalidInputError,
+    PlaybookExecutionError,
+    SkillExecutionError,
+    SkillNotFoundError,
+    TemplateError,
+)
 from .loader import PlaybookLoader, PlaybookLoadError
 from .models import (
     DecisionBranch,
@@ -25,8 +34,14 @@ __all__ = [
     "StepType",
     "PlaybookEngine",
     "PlaybookExecutionError",
+    "SkillNotFoundError",
+    "TemplateError",
+    "SkillExecutionError",
+    "InvalidInputError",
+    "CheckpointError",
     "ExecutionContext",
     "ExecutionTrace",
     "ExecutionTracer",
     "StepTrace",
+    "CheckpointManager",
 ]

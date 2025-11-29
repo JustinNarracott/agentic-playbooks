@@ -8,6 +8,13 @@ from jinja2 import Environment, TemplateSyntaxError
 
 from ..skills.base import Skill
 from ..skills.registry import SkillRegistry
+from .checkpoint import CheckpointManager
+from .errors import (
+    PlaybookExecutionError,
+    SkillExecutionError,
+    SkillNotFoundError,
+    TemplateError,
+)
 from .models import DecisionStep, Playbook, SkillStep, Step
 from .tracer import ExecutionTrace, StepTrace
 
@@ -32,18 +39,19 @@ class ExecutionContext:
         """Get a variable from the context."""
         return self.variables.get(name)
 
-    def evaluate_condition(self, condition: str) -> bool:
+    def evaluate_condition(self, condition: str, step_name: str = "unknown") -> bool:
         """
         Evaluate a Jinja2 condition template.
 
         Args:
             condition: Jinja2 template condition string
+            step_name: Name of the step for error context
 
         Returns:
             Boolean result of condition evaluation
 
         Raises:
-            PlaybookExecutionError: If condition cannot be evaluated
+            TemplateError: If condition cannot be evaluated
         """
         try:
             template = self._jinja_env.from_string("{{ " + condition + " }}")
@@ -54,9 +62,21 @@ class ExecutionContext:
                 return result not in ("false", "0", "", "none")
             return bool(result)
         except TemplateSyntaxError as e:
-            raise PlaybookExecutionError(f"Invalid condition syntax: {e}")
+            raise TemplateError(
+                template_str=condition,
+                error=e,
+                step_name=step_name,
+                field_name="condition",
+                available_vars=self.variables,
+            ) from e
         except Exception as e:
-            raise PlaybookExecutionError(f"Failed to evaluate condition: {e}")
+            raise TemplateError(
+                template_str=condition,
+                error=e,
+                step_name=step_name,
+                field_name="condition",
+                available_vars=self.variables,
+            ) from e
 
     def render_template(self, template_str: str) -> Any:
         """
@@ -118,12 +138,6 @@ class ExecutionContext:
         return result
 
 
-class PlaybookExecutionError(Exception):
-    """Raised when playbook execution fails."""
-
-    pass
-
-
 class PlaybookEngine:
     """
     Executes playbooks with skills and decision logic.
@@ -149,38 +163,84 @@ class PlaybookEngine:
         self,
         playbook: Playbook,
         initial_context: Optional[Dict[str, Any]] = None,
+        resume_from: Optional[str] = None,
+        checkpoint_dir: Optional[str] = None,
     ) -> ExecutionTrace:
         """
-        Execute a playbook.
+        Execute a playbook with optional checkpoint/resume support.
 
         Args:
             playbook: The playbook to execute
             initial_context: Optional initial context variables
+            resume_from: Optional execution ID to resume from checkpoint
+            checkpoint_dir: Optional directory for checkpoint files
 
         Returns:
             ExecutionTrace with complete execution details
 
         Raises:
             PlaybookExecutionError: If execution fails
+            CheckpointError: If checkpoint operations fail
         """
-        execution_id = str(uuid.uuid4())
-        trace = ExecutionTrace(playbook.metadata.name, execution_id)
+        # Initialize checkpoint manager if checkpoint_dir provided
+        checkpoint_manager = (
+            CheckpointManager(checkpoint_dir) if checkpoint_dir else None
+        )
 
-        # Merge playbook variables with initial context
-        context_vars = {**playbook.variables, **(initial_context or {})}
-        context = ExecutionContext(context_vars)
+        # Resume from checkpoint if requested
+        if resume_from and checkpoint_manager:
+            checkpoint = checkpoint_manager.load_checkpoint(resume_from)
+            if not checkpoint:
+                raise PlaybookExecutionError(
+                    f"Checkpoint not found for execution: {resume_from}"
+                )
+
+            execution_id = checkpoint["execution_id"]
+            trace = self._restore_trace(checkpoint)
+            context = ExecutionContext(checkpoint["context"])
+            start_step = checkpoint["current_step"]
+        else:
+            execution_id = str(uuid.uuid4())
+            trace = ExecutionTrace(playbook.metadata.name, execution_id)
+            context_vars = {**playbook.variables, **(initial_context or {})}
+            context = ExecutionContext(context_vars)
+            start_step = 0
 
         try:
-            # Execute all steps
-            for step in playbook.steps:
+            # Execute steps (starting from checkpoint if resuming)
+            for i, step in enumerate(playbook.steps[start_step:], start=start_step):
                 await self._execute_step(step, context, trace.steps)
 
+                # Save checkpoint after each step if enabled
+                if checkpoint_manager:
+                    checkpoint_manager.save_checkpoint(
+                        execution_id=execution_id,
+                        playbook_name=playbook.metadata.name,
+                        current_step=i + 1,
+                        context_vars=context.variables,
+                        completed_steps=trace.steps,
+                    )
+
             trace.success = True
+
+            # Clean up checkpoint on successful completion
+            if checkpoint_manager:
+                checkpoint_manager.delete_checkpoint(execution_id)
 
         except Exception as e:
             trace.error = str(e)
             trace.success = False
-            raise PlaybookExecutionError(f"Playbook execution failed: {e}")
+
+            # Provide helpful message about resuming from checkpoint
+            if checkpoint_manager:
+                print(f"\nExecution failed at step {len(trace.steps)}.")
+                print("Resume with:")
+                print(
+                    f"  engine.execute(playbook, resume_from='{execution_id}', "
+                    f"checkpoint_dir='{checkpoint_dir}')"
+                )
+
+            raise
 
         finally:
             trace.completed_at = datetime.utcnow()
@@ -188,6 +248,44 @@ class PlaybookEngine:
                 (trace.completed_at - trace.started_at).total_seconds() * 1000
             )
             trace.final_context = context.variables.copy()
+
+        return trace
+
+    def _restore_trace(self, checkpoint: Dict[str, Any]) -> ExecutionTrace:
+        """
+        Restore ExecutionTrace from checkpoint data.
+
+        Args:
+            checkpoint: Checkpoint dictionary
+
+        Returns:
+            Restored ExecutionTrace
+        """
+        trace = ExecutionTrace(
+            playbook_name=checkpoint["playbook_name"],
+            execution_id=checkpoint["execution_id"],
+        )
+
+        # Restore completed steps
+        for step_data in checkpoint.get("completed_steps", []):
+            step_trace = StepTrace(
+                step_name=step_data.get("step_name", "unknown"),
+                step_type=step_data.get("step_type", "unknown"),
+                started_at=datetime.fromisoformat(step_data["started_at"]),
+            )
+
+            if step_data.get("completed_at"):
+                step_trace.completed_at = datetime.fromisoformat(
+                    step_data["completed_at"]
+                )
+
+            if step_data.get("duration_ms"):
+                step_trace.duration_ms = step_data["duration_ms"]
+
+            if step_data.get("error"):
+                step_trace.error = step_data["error"]
+
+            trace.steps.append(step_trace)
 
         return trace
 
@@ -240,7 +338,12 @@ class PlaybookEngine:
             # Get skill from registry
             skill_class = self.skill_registry.get(step.skill)
             if skill_class is None:
-                raise PlaybookExecutionError(f"Skill not found: {step.skill}")
+                raise SkillNotFoundError(
+                    skill_name=step.skill,
+                    step_name=step.name,
+                    available_skills=self.skill_registry.list_skills(),
+                    playbook_name="unknown",  # Will be set by execute() context
+                )
 
             # Instantiate skill
             skill: Skill = skill_class()
@@ -262,10 +365,28 @@ class PlaybookEngine:
                 (step_trace.completed_at - step_trace.started_at).total_seconds() * 1000
             )
 
-        except Exception as e:
-            step_trace.error = str(e)
+        except SkillNotFoundError:
+            # Re-raise SkillNotFoundError as-is
+            step_trace.error = "Skill not found"
             step_trace.completed_at = datetime.utcnow()
             raise
+        except Exception as e:
+            # Wrap other exceptions in SkillExecutionError
+            step_trace.error = str(e)
+            step_trace.completed_at = datetime.utcnow()
+
+            # Extract reasoning from skill trace if available
+            reasoning = None
+            if step_trace.skill_trace and hasattr(step_trace.skill_trace, "reasoning"):
+                reasoning = step_trace.skill_trace.reasoning
+
+            raise SkillExecutionError(
+                skill_name=step.skill,
+                step_name=step.name,
+                input_data=rendered_input,
+                original_error=e,
+                reasoning=reasoning,
+            ) from e
 
     async def _execute_decision_step(
         self,
@@ -292,7 +413,7 @@ class PlaybookEngine:
             # Evaluate branches in order
             branch_taken = False
             for i, branch in enumerate(step.branches):
-                if context.evaluate_condition(branch.condition):
+                if context.evaluate_condition(branch.condition, step_name=step.name):
                     step_trace.decision_taken = f"branch_{i}: {branch.condition}"
                     # Execute branch steps
                     for branch_step in branch.steps:
