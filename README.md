@@ -5,6 +5,8 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 [![Status](https://img.shields.io/badge/status-alpha-orange.svg)]()
+[![codecov](https://codecov.io/gh/JustinNarracott/agentic-playbooks/branch/main/graph/badge.svg)](https://codecov.io/gh/JustinNarracott/agentic-playbooks)
+[![CI](https://github.com/JustinNarracott/agentic-playbooks/workflows/CI/badge.svg)](https://github.com/JustinNarracott/agentic-playbooks/actions)
 
 ---
 
