@@ -1,5 +1,6 @@
 """Playbook engine - core execution logic."""
 
+from .batch import BatchExecutor, BatchResult, BatchResults
 from .checkpoint import CheckpointManager
 from .engine import ExecutionContext, PlaybookEngine
 from .errors import (
@@ -50,4 +51,7 @@ __all__ = [
     "ValidationLevel",
     "ValidationMessage",
     "PlaybookVisualizer",
+    "BatchExecutor",
+    "BatchResult",
+    "BatchResults",
 ]
