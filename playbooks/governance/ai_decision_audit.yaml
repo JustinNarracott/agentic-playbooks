@@ -1,0 +1,52 @@
+metadata:
+  name: ai_decision_audit
+  version: 1.0.0
+  description: >
+    Comprehensive audit of AI decisions for governance and compliance.
+    Extracts decision context, identifies risks, and generates leadership questions.
+  author: Agentic Playbooks
+  tags:
+    - governance
+    - audit
+    - compliance
+    - risk-management
+
+variables:
+  # Input variable - the decision text to audit
+  decision_text: ""
+
+steps:
+  - name: extract_decision_context
+    type: skill
+    skill: decision_context_extractor
+    input:
+      decision_text: "{{ decision_text }}"
+    output_var: context_extraction
+
+  - name: analyze_risks
+    type: skill
+    skill: risk_identifier
+    input:
+      decision_context: "{{ context_extraction.context }}"
+    output_var: risk_analysis
+
+  - name: generate_leadership_questions
+    type: skill
+    skill: leadership_questions_generator
+    input:
+      decision_context: "{{ context_extraction.context }}"
+      risk_analysis: "{{ risk_analysis.analysis }}"
+    output_var: leadership_review
+
+  - name: assess_risk_level
+    type: decision
+    branches:
+      - condition: "risk_analysis.analysis.overall_risk_level == 'critical' or risk_analysis.analysis.overall_risk_level == 'high'"
+        steps:
+          - name: flag_for_immediate_review
+            type: skill
+            skill: decision_context_extractor
+            input:
+              decision_text: "HIGH/CRITICAL RISK: Immediate review required for {{ context_extraction.context.decision_summary }}"
+              additional_context: "Risk level: {{ risk_analysis.analysis.overall_risk_level }}"
+            output_var: escalation_flag
