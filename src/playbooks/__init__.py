@@ -21,6 +21,7 @@ from .models import (
     StepType,
 )
 from .tracer import ExecutionTrace, ExecutionTracer, StepTrace
+from .validator import PlaybookValidator, ValidationLevel, ValidationMessage
 from .visualizer import PlaybookVisualizer
 
 __all__ = [
@@ -45,5 +46,8 @@ __all__ = [
     "ExecutionTracer",
     "StepTrace",
     "CheckpointManager",
+    "PlaybookValidator",
+    "ValidationLevel",
+    "ValidationMessage",
     "PlaybookVisualizer",
 ]
