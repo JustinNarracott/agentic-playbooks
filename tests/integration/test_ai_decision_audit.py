@@ -121,7 +121,10 @@ def mock_openai_client(
 
         # Determine which response to return based on content
         # Check for leadership questions FIRST (before Decision Summary check)
-        if "Generate leadership review questions" in user_content or "leadership advisor" in system_content:
+        if (
+            "Generate leadership review questions" in user_content
+            or "leadership advisor" in system_content
+        ):
             response_data = mock_openai_questions_response
         elif "Decision Text:" in user_content:
             response_data = mock_openai_context_response
