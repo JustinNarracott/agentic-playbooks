@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue view:*)",
+      "Bash(git checkout:*)",
+      "Bash(docker exec playbooks-workspace pytest tests/unit/test_playbook_loader.py -v)",
+      "Bash(docker exec:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
