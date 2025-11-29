@@ -45,7 +45,7 @@ services:
     image: redis:7-alpine
     container_name: playbooks-redis
     ports:
-      - "6380:6379"
+      - "6381:6379"
     networks:
       - dev-network
 
