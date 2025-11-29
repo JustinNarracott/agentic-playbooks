@@ -1,6 +1,19 @@
-# Environment
+# Environment variables and secrets
 .env
-.env.local
+.env.*
+!.env.example
+*.env
+.envrc
+
+# Credentials and keys
+credentials.json
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.yaml
+secrets.yml
+config/secrets/
 
 # Python
 __pycache__/
@@ -49,6 +62,14 @@ htmlcov/
 
 # Docker
 docker/postgres/data/
+docker/n8n/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Checkpoints (may contain sensitive data)
+checkpoints/
+*.checkpoint
 
 # OS
 .DS_Store
