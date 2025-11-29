@@ -86,9 +86,38 @@ class ExecutionContext:
             template_str: Template string to render
 
         Returns:
-            Rendered result, attempting to preserve numeric types
+            Rendered result, preserving original types when possible
         """
         try:
+            # Check if this is a simple variable reference (e.g., "{{ var }}" or "{{ obj.attr }}")
+            # If so, return the actual object instead of converting to string
+            stripped = template_str.strip()
+            if stripped.startswith("{{") and stripped.endswith("}}"):
+                # Extract the variable path
+                var_path = stripped[2:-2].strip()
+
+                # Try to evaluate the variable path directly to preserve type
+                try:
+                    # Split on dots for nested access
+                    parts = var_path.split(".")
+                    value = self.variables.get(parts[0])
+
+                    # Navigate nested attributes/keys
+                    for part in parts[1:]:
+                        if value is None:
+                            break
+                        if isinstance(value, dict):
+                            value = value.get(part)
+                        else:
+                            value = getattr(value, part, None)
+
+                    # If we successfully resolved the path, return the actual value
+                    if value is not None:
+                        return value
+                except (KeyError, AttributeError, IndexError):
+                    pass  # Fall through to normal rendering
+
+            # Normal template rendering
             template = self._jinja_env.from_string(str(template_str))
             result = template.render(**self.variables)
 

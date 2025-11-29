@@ -57,12 +57,21 @@ def mock_openai_risk_response() -> dict:
             {
                 "severity": "high",
                 "description": "High debt-to-income ratio increases default risk",
+                "category": "business",
+                "likelihood": "medium",
             },
             {
                 "severity": "medium",
                 "description": "New business venture has uncertain revenue",
+                "category": "business",
+                "likelihood": "high",
             },
-            {"severity": "low", "description": "Limited credit history"},
+            {
+                "severity": "low",
+                "description": "Limited credit history",
+                "category": "compliance",
+                "likelihood": "low",
+            },
         ],
         "overall_risk_level": "high",
         "recommended_actions": [
@@ -70,6 +79,7 @@ def mock_openai_risk_response() -> dict:
             "Reduce loan amount",
             "Implement stricter monitoring",
         ],
+        "confidence_level": "high",
     }
 
 
@@ -111,10 +121,7 @@ def mock_openai_client(
         # Determine which response to return based on content
         if "Decision Text:" in user_content:
             response_data = mock_openai_context_response
-        elif (
-            "Decision Context:" in user_content
-            and "Analyze this decision" in user_content
-        ):
+        elif "Decision Summary:" in user_content:
             response_data = mock_openai_risk_response
         elif "Generate leadership review questions" in user_content:
             response_data = mock_openai_questions_response
