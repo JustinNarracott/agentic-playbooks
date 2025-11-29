@@ -116,15 +116,17 @@ def mock_openai_client(
     async def mock_create(**kwargs: dict) -> MagicMock:
         """Mock the create method based on the prompt content."""
         messages = kwargs.get("messages", [])
+        system_content = messages[0]["content"] if len(messages) > 0 else ""
         user_content = messages[1]["content"] if len(messages) > 1 else ""
 
         # Determine which response to return based on content
-        if "Decision Text:" in user_content:
+        # Check for leadership questions FIRST (before Decision Summary check)
+        if "Generate leadership review questions" in user_content or "leadership advisor" in system_content:
+            response_data = mock_openai_questions_response
+        elif "Decision Text:" in user_content:
             response_data = mock_openai_context_response
         elif "Decision Summary:" in user_content:
             response_data = mock_openai_risk_response
-        elif "Generate leadership review questions" in user_content:
-            response_data = mock_openai_questions_response
         else:
             response_data = mock_openai_context_response
 
