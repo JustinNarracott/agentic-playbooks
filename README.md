@@ -18,7 +18,7 @@
 
 ## 🤔 Why Agentic Playbooks?
 
-AI agents are powerful, but they're often **unpredictable**. When they make decisions, can you explain why? Can you audit them? Can leadership trust them?
+AI agents are powerful, but boards and executives ask hard questions: *Can you explain why it made that decision? Can you audit it? Can you govern it?* Traditional agentic systems hide decision logic in opaque prompts—making oversight nearly impossible.
 
 <p align="center">
   <img src="docs/images/chaos-vs-order.png" alt="Chaos vs Order" width="80%">
@@ -92,6 +92,21 @@ print(f"Leadership Questions: {trace.final_context['leadership_review']['questio
   }
 }
 ```
+
+---
+
+## 📦 Example Playbook Modules
+
+Agentic Playbooks is designed to support multiple domains using the same pattern:
+
+- 🧭 **Governance / CAIO** – AI decision audits, risk analysis, leadership questions
+- 📊 **PMO & Delivery** – project health-checks and intervention planning
+- 🚀 **Sales & GTM** – lead qualification, opportunity analysis
+- 🔁 **Transformation** – opportunity scans, quick wins vs strategic plays
+- 🧠 **Knowledge Work** – research curation and thematic synthesis
+- 🧍 **Personal Agency** – career acceleration and positioning playbooks
+
+The current codebase focuses on **governance** (AI Decision Audit), with additional modules using the same skills → playbooks → traces pattern.
 
 ---
 
