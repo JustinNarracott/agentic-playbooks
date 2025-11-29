@@ -6,9 +6,10 @@ from typing import Any, Dict, List, Optional
 
 from jinja2 import Environment, TemplateSyntaxError
 
-from ..skills.base import Skill, SkillTrace
+from ..skills.base import Skill
 from ..skills.registry import SkillRegistry
 from .models import DecisionStep, Playbook, SkillStep, Step
+from .tracer import ExecutionTrace, StepTrace
 
 
 class ExecutionContext:
@@ -115,43 +116,6 @@ class ExecutionContext:
             else:
                 result[key] = value
         return result
-
-
-class StepTrace:
-    """Trace of a single step execution."""
-
-    def __init__(
-        self,
-        step_name: str,
-        step_type: str,
-        started_at: datetime,
-    ) -> None:
-        """Initialize step trace."""
-        self.step_name = step_name
-        self.step_type = step_type
-        self.started_at = started_at
-        self.completed_at: Optional[datetime] = None
-        self.duration_ms: Optional[int] = None
-        self.skill_trace: Optional[SkillTrace] = None
-        self.decision_taken: Optional[str] = None
-        self.error: Optional[str] = None
-        self.nested_steps: List["StepTrace"] = []
-
-
-class ExecutionTrace:
-    """Complete trace of playbook execution."""
-
-    def __init__(self, playbook_name: str, execution_id: str) -> None:
-        """Initialize execution trace."""
-        self.playbook_name = playbook_name
-        self.execution_id = execution_id
-        self.started_at = datetime.utcnow()
-        self.completed_at: Optional[datetime] = None
-        self.duration_ms: Optional[int] = None
-        self.steps: List[StepTrace] = []
-        self.final_context: Dict[str, Any] = {}
-        self.error: Optional[str] = None
-        self.success: bool = False
 
 
 class PlaybookExecutionError(Exception):
