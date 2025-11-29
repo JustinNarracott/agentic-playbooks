@@ -654,7 +654,6 @@ class MySkill(Skill):
 ## Additional Resources
 
 - [Architecture Documentation](architecture.md) - Framework design and patterns
-- [API Documentation](api.md) - Complete API reference
-- [Examples](../examples/) - Sample skills and playbooks
+- [README](../README.md) - Project overview and quick start
 
-For questions or contributions, see the project README.
+For questions or contributions, see [CONTRIBUTING.md](../CONTRIBUTING.md).
