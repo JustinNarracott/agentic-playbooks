@@ -324,6 +324,15 @@ Built on concepts from:
 
 ---
 
+## 👤 Author & Contact
+
+Agentic Playbooks is maintained by **Justin Narracott**.
+
+- LinkedIn: [linkedin.com/in/justinnarracott](https://www.linkedin.com/in/justinnarracott/)
+- Email: justinnarracott@gmail.com
+
+---
+
 ## 💬 Community
 
 - **Issues**: [GitHub Issues](https://github.com/JustinNarracott/agentic-playbooks/issues)
