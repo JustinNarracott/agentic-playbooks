@@ -27,7 +27,7 @@ class SkillRegistry:
 
     _instance: Optional["SkillRegistry"] = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._skills: Dict[str, Type[Skill]] = {}
 
     @classmethod

@@ -57,7 +57,7 @@ class Skill(ABC):
     version: str = "0.0.0"
     description: str = ""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._trace: Optional[SkillTrace] = None
 
     @abstractmethod

@@ -10,7 +10,9 @@
       "Bash(git push:*)",
       "Bash(gh pr create --title \"feat: implement PlaybookLoader with Pydantic models\" --body \"$(cat <<''EOF''\n## Summary\nImplements the PlaybookLoader class that loads and validates playbook definitions from YAML files using Pydantic models.\n\n## Related Issue\nCloses #1\n\n## Changes\n- Created Pydantic models for playbook structure (`models.py`):\n  - `Playbook`, `PlaybookMetadata` for top-level structure\n  - `SkillStep` and `DecisionStep` with proper type discrimination\n  - `DecisionBranch` for conditional branching\n  - `StepType` enum for step types\n- Implemented `PlaybookLoader` class (`loader.py`):\n  - Load from YAML files or strings\n  - Load from Python dictionaries\n  - Optional Jinja2 template variable substitution (when variables provided)\n  - Comprehensive error handling with custom `PlaybookLoadError`\n  - Recursive parsing for nested decision steps\n- Added comprehensive unit tests (`test_playbook_loader.py`):\n  - 22 test cases covering all functionality\n  - Tests for validation, error handling, edge cases\n  - 93% code coverage (exceeds 80% requirement)\n\n## Testing\n- [x] Unit tests added/updated\n- [x] Integration tests pass\n- [x] `pytest` passes locally (in Docker workspace)\n- [ ] `black .` passes\n- [ ] `ruff check .` passes\n\n## Documentation\n- [x] README updated (if needed) - N/A for this change\n- [x] Docstrings added\n- [ ] CHANGELOG updated\n\n@justinnarracott ready for review 🍾\nEOF\n)\")",
       "Bash(gh pr checks:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(git commit:*)",
+      "Bash(gh pr view:*)"
     ],
     "deny": [],
     "ask": []

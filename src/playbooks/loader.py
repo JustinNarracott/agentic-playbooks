@@ -178,6 +178,7 @@ class PlaybookLoader:
             step_type = step_data["type"]
 
             try:
+                step: Step
                 if step_type == StepType.SKILL.value:
                     step = SkillStep(**step_data)
                 elif step_type == StepType.DECISION.value:
