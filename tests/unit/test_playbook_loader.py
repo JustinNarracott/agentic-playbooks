@@ -1,17 +1,16 @@
 """Unit tests for PlaybookLoader."""
 
-import pytest
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from pydantic import ValidationError
+
+import pytest
 
 from src.playbooks.loader import PlaybookLoader, PlaybookLoadError
 from src.playbooks.models import (
-    Playbook,
-    StepType,
-    SkillStep,
     DecisionStep,
-    PlaybookMetadata,
+    Playbook,
+    SkillStep,
+    StepType,
 )
 
 
@@ -100,7 +99,9 @@ steps:
           message: Low score
 """
 
-    def test_load_from_string_simple(self, loader: PlaybookLoader, simple_playbook_yaml: str) -> None:
+    def test_load_from_string_simple(
+        self, loader: PlaybookLoader, simple_playbook_yaml: str
+    ) -> None:
         """Test loading a simple playbook from string."""
         playbook = loader.load_from_string(simple_playbook_yaml)
 
@@ -113,7 +114,9 @@ steps:
         assert playbook.variables["max_retries"] == 3
         assert len(playbook.steps) == 2
 
-    def test_load_from_string_with_template_variables(self, loader: PlaybookLoader) -> None:
+    def test_load_from_string_with_template_variables(
+        self, loader: PlaybookLoader
+    ) -> None:
         """Test loading with Jinja2 template variables."""
         yaml_with_vars = """
 metadata:
@@ -133,7 +136,7 @@ steps:
         variables = {
             "playbook_name": "dynamic_playbook",
             "api_key": "secret123",
-            "api_url": "https://api.test.com"
+            "api_url": "https://api.test.com",
         }
 
         playbook = loader.load_from_string(yaml_with_vars, variables)
@@ -142,9 +145,13 @@ steps:
         assert playbook.variables["api_key"] == "secret123"
         assert playbook.steps[0].input["url"] == "https://api.test.com"
 
-    def test_load_from_file(self, loader: PlaybookLoader, simple_playbook_yaml: str) -> None:
+    def test_load_from_file(
+        self, loader: PlaybookLoader, simple_playbook_yaml: str
+    ) -> None:
         """Test loading from a file."""
-        with NamedTemporaryFile(mode='w', suffix='.yaml', delete=False, encoding='utf-8') as f:
+        with NamedTemporaryFile(
+            mode="w", suffix=".yaml", delete=False, encoding="utf-8"
+        ) as f:
             f.write(simple_playbook_yaml)
             temp_path = Path(f.name)
 
@@ -159,12 +166,16 @@ steps:
         with pytest.raises(PlaybookLoadError, match="Playbook file not found"):
             loader.load_from_file("nonexistent.yaml")
 
-    def test_load_from_file_is_directory(self, loader: PlaybookLoader, tmp_path: Path) -> None:
+    def test_load_from_file_is_directory(
+        self, loader: PlaybookLoader, tmp_path: Path
+    ) -> None:
         """Test loading from directory instead of file."""
         with pytest.raises(PlaybookLoadError, match="Path is not a file"):
             loader.load_from_file(tmp_path)
 
-    def test_load_skill_steps(self, loader: PlaybookLoader, simple_playbook_yaml: str) -> None:
+    def test_load_skill_steps(
+        self, loader: PlaybookLoader, simple_playbook_yaml: str
+    ) -> None:
         """Test that skill steps are parsed correctly."""
         playbook = loader.load_from_string(simple_playbook_yaml)
 
@@ -181,7 +192,9 @@ steps:
         assert step2.name == "process_data"
         assert step2.skill == "data_processor"
 
-    def test_load_decision_steps(self, loader: PlaybookLoader, decision_playbook_yaml: str) -> None:
+    def test_load_decision_steps(
+        self, loader: PlaybookLoader, decision_playbook_yaml: str
+    ) -> None:
         """Test that decision steps are parsed correctly."""
         playbook = loader.load_from_string(decision_playbook_yaml)
 
@@ -343,7 +356,7 @@ steps:
                     "name": "test_step",
                     "skill": "test_skill",
                 }
-            ]
+            ],
         }
 
         playbook = loader.load_from_dict(data)
@@ -384,7 +397,9 @@ steps:
         assert isinstance(inner_decision, DecisionStep)
         assert inner_decision.name == "inner_decision"
 
-    def test_playbook_repr(self, loader: PlaybookLoader, simple_playbook_yaml: str) -> None:
+    def test_playbook_repr(
+        self, loader: PlaybookLoader, simple_playbook_yaml: str
+    ) -> None:
         """Test Playbook __repr__ method."""
         playbook = loader.load_from_string(simple_playbook_yaml)
         repr_str = repr(playbook)

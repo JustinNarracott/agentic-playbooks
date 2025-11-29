@@ -2,11 +2,13 @@
 
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
+
 from pydantic import BaseModel, Field, field_validator
 
 
 class StepType(str, Enum):
     """Type of step in a playbook."""
+
     SKILL = "skill"
     DECISION = "decision"
 
@@ -17,10 +19,12 @@ class SkillStep(BaseModel):
     type: StepType = Field(default=StepType.SKILL)
     name: str = Field(..., description="Name of this step")
     skill: str = Field(..., description="Name of the skill to execute")
-    input: Dict[str, Any] = Field(default_factory=dict, description="Input parameters for the skill")
+    input: Dict[str, Any] = Field(
+        default_factory=dict, description="Input parameters for the skill"
+    )
     output_var: Optional[str] = Field(None, description="Variable name to store output")
 
-    @field_validator('type')
+    @field_validator("type")
     @classmethod
     def validate_type(cls, v: StepType) -> StepType:
         """Ensure type is SKILL."""
@@ -33,7 +37,9 @@ class DecisionBranch(BaseModel):
     """A branch in a decision step."""
 
     condition: str = Field(..., description="Jinja2 template condition to evaluate")
-    steps: List['Step'] = Field(default_factory=list, description="Steps to execute if condition is true")
+    steps: List["Step"] = Field(
+        default_factory=list, description="Steps to execute if condition is true"
+    )
 
 
 class DecisionStep(BaseModel):
@@ -41,10 +47,14 @@ class DecisionStep(BaseModel):
 
     type: StepType = Field(default=StepType.DECISION)
     name: str = Field(..., description="Name of this decision step")
-    branches: List[DecisionBranch] = Field(..., description="List of conditional branches")
-    default: Optional[List['Step']] = Field(None, description="Default steps if no condition matches")
+    branches: List[DecisionBranch] = Field(
+        ..., description="List of conditional branches"
+    )
+    default: Optional[List["Step"]] = Field(
+        None, description="Default steps if no condition matches"
+    )
 
-    @field_validator('type')
+    @field_validator("type")
     @classmethod
     def validate_type(cls, v: StepType) -> StepType:
         """Ensure type is DECISION."""
@@ -80,10 +90,12 @@ class Playbook(BaseModel):
     """
 
     metadata: PlaybookMetadata = Field(..., description="Playbook metadata")
-    variables: Dict[str, Any] = Field(default_factory=dict, description="Template variables")
+    variables: Dict[str, Any] = Field(
+        default_factory=dict, description="Template variables"
+    )
     steps: List[Step] = Field(..., description="Sequential steps to execute")
 
-    @field_validator('steps')
+    @field_validator("steps")
     @classmethod
     def validate_steps_not_empty(cls, v: List[Step]) -> List[Step]:
         """Ensure playbook has at least one step."""

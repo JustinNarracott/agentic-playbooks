@@ -2,15 +2,17 @@
 
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
+
 import yaml
-from jinja2 import Environment, StrictUndefined, TemplateSyntaxError
+from jinja2 import Environment, TemplateSyntaxError
 from pydantic import ValidationError
 
-from .models import Playbook, PlaybookMetadata, Step, SkillStep, DecisionStep, StepType
+from .models import DecisionStep, Playbook, SkillStep, Step, StepType
 
 
 class PlaybookLoadError(Exception):
     """Raised when a playbook cannot be loaded or validated."""
+
     pass
 
 
@@ -45,9 +47,7 @@ class PlaybookLoader:
         )
 
     def load_from_file(
-        self,
-        file_path: Union[str, Path],
-        variables: Optional[Dict[str, Any]] = None
+        self, file_path: Union[str, Path], variables: Optional[Dict[str, Any]] = None
     ) -> Playbook:
         """
         Load a playbook from a YAML file.
@@ -71,16 +71,14 @@ class PlaybookLoader:
             raise PlaybookLoadError(f"Path is not a file: {file_path}")
 
         try:
-            content = file_path.read_text(encoding='utf-8')
+            content = file_path.read_text(encoding="utf-8")
         except Exception as e:
             raise PlaybookLoadError(f"Failed to read file {file_path}: {e}")
 
         return self.load_from_string(content, variables)
 
     def load_from_string(
-        self,
-        yaml_content: str,
-        variables: Optional[Dict[str, Any]] = None
+        self, yaml_content: str, variables: Optional[Dict[str, Any]] = None
     ) -> Playbook:
         """
         Load a playbook from a YAML string.
@@ -130,21 +128,21 @@ class PlaybookLoader:
         """
         try:
             # Ensure metadata exists
-            if 'metadata' not in data:
+            if "metadata" not in data:
                 raise PlaybookLoadError("Playbook must have 'metadata' section")
 
             # Ensure steps exist
-            if 'steps' not in data:
+            if "steps" not in data:
                 raise PlaybookLoadError("Playbook must have 'steps' section")
 
             # Parse steps with proper type discrimination
-            steps = self._parse_steps(data['steps'])
+            steps = self._parse_steps(data["steps"])
 
             # Build playbook data
             playbook_data = {
-                'metadata': data['metadata'],
-                'variables': data.get('variables', {}),
-                'steps': steps,
+                "metadata": data["metadata"],
+                "variables": data.get("variables", {}),
+                "steps": steps,
             }
 
             return Playbook(**playbook_data)
@@ -174,24 +172,24 @@ class PlaybookLoader:
             if not isinstance(step_data, dict):
                 raise PlaybookLoadError(f"Step {i} must be a dictionary")
 
-            if 'type' not in step_data:
+            if "type" not in step_data:
                 raise PlaybookLoadError(f"Step {i} must have a 'type' field")
 
-            step_type = step_data['type']
+            step_type = step_data["type"]
 
             try:
                 if step_type == StepType.SKILL.value:
                     step = SkillStep(**step_data)
                 elif step_type == StepType.DECISION.value:
                     # Recursively parse branches
-                    if 'branches' in step_data:
-                        for branch in step_data['branches']:
-                            if 'steps' in branch:
-                                branch['steps'] = self._parse_steps(branch['steps'])
+                    if "branches" in step_data:
+                        for branch in step_data["branches"]:
+                            if "steps" in branch:
+                                branch["steps"] = self._parse_steps(branch["steps"])
 
                     # Parse default steps if present
-                    if 'default' in step_data and step_data['default']:
-                        step_data['default'] = self._parse_steps(step_data['default'])
+                    if "default" in step_data and step_data["default"]:
+                        step_data["default"] = self._parse_steps(step_data["default"])
 
                     step = DecisionStep(**step_data)
                 else:
