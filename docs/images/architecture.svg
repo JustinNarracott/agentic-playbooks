@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="yamlGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="engineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="skillGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <linearGradient id="traceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ec4899"/>
+      <stop offset="100%" style="stop-color:#db2777"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+    <style>
+      .label { font-family: 'Segoe UI', sans-serif; font-weight: 600; fill: white; }
+      .sublabel { font-family: 'Segoe UI', sans-serif; font-weight: 400; fill: #94a3b8; font-size: 12px; }
+      .code { font-family: 'Consolas', monospace; fill: #e2e8f0; font-size: 11px; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="500" rx="12" fill="url(#bgGrad)"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" fill="#f8fafc" font-size="20" font-weight="600" font-family="Segoe UI">Agentic Playbooks Architecture</text>
+  
+  <!-- YAML Playbook (Top) -->
+  <g transform="translate(300, 70)" filter="url(#shadow)">
+    <rect width="200" height="70" rx="10" fill="url(#yamlGrad)"/>
+    <text x="100" y="35" text-anchor="middle" class="label" font-size="16">📋 Playbook</text>
+    <text x="100" y="55" text-anchor="middle" class="code">playbook.yaml</text>
+  </g>
+  
+  <!-- Arrow 1 -->
+  <path d="M400 145 L400 175" stroke="#475569" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569"/>
+    </marker>
+  </defs>
+  
+  <!-- PlaybookEngine (Center) -->
+  <g transform="translate(250, 180)" filter="url(#shadow)">
+    <rect width="300" height="80" rx="10" fill="url(#engineGrad)"/>
+    <text x="150" y="35" text-anchor="middle" class="label" font-size="16">⚙️ PlaybookEngine</text>
+    <text x="150" y="55" text-anchor="middle" class="sublabel" fill="#c7d2fe">Orchestrates • Decides • Traces</text>
+  </g>
+  
+  <!-- Arrow 2 (splits to skills) -->
+  <path d="M400 265 L400 290 L200 290 L200 320" stroke="#475569" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M400 265 L400 290 L400 320" stroke="#475569" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M400 265 L400 290 L600 290 L600 320" stroke="#475569" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Skills (Row of 3) -->
+  <g transform="translate(80, 325)" filter="url(#shadow)">
+    <rect width="160" height="70" rx="10" fill="url(#skillGrad)"/>
+    <text x="80" y="30" text-anchor="middle" class="label" font-size="14">🎯 Skill</text>
+    <text x="80" y="50" text-anchor="middle" class="code">DecisionContext</text>
+  </g>
+  
+  <g transform="translate(320, 325)" filter="url(#shadow)">
+    <rect width="160" height="70" rx="10" fill="url(#skillGrad)"/>
+    <text x="80" y="30" text-anchor="middle" class="label" font-size="14">🎯 Skill</text>
+    <text x="80" y="50" text-anchor="middle" class="code">RiskIdentifier</text>
+  </g>
+  
+  <g transform="translate(560, 325)" filter="url(#shadow)">
+    <rect width="160" height="70" rx="10" fill="url(#skillGrad)"/>
+    <text x="80" y="30" text-anchor="middle" class="label" font-size="14">🎯 Skill</text>
+    <text x="80" y="50" text-anchor="middle" class="code">LeadershipQs</text>
+  </g>
+  
+  <!-- Arrow 3 (converges to trace) -->
+  <path d="M200 400 L200 420 L400 420 L400 440" stroke="#475569" stroke-width="3" fill="none"/>
+  <path d="M400 400 L400 440" stroke="#475569" stroke-width="3" fill="none"/>
+  <path d="M600 400 L600 420 L400 420" stroke="#475569" stroke-width="3" fill="none"/>
+  <polygon points="395 435, 400 445, 405 435" fill="#475569"/>
+  
+  <!-- ExecutionTrace (Bottom) -->
+  <g transform="translate(250, 450)" filter="url(#shadow)">
+    <rect width="300" height="40" rx="8" fill="url(#traceGrad)"/>
+    <text x="150" y="26" text-anchor="middle" class="label" font-size="14">📊 ExecutionTrace (Full Audit Trail)</text>
+  </g>
+  
+</svg>

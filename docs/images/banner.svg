@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 627" width="1200" height="627">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f"/>
+      <stop offset="50%" style="stop-color:#12121a"/>
+      <stop offset="100%" style="stop-color:#0d1117"/>
+    </linearGradient>
+    <linearGradient id="titleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#818cf8"/>
+      <stop offset="100%" style="stop-color:#6ee7b7"/>
+    </linearGradient>
+    <linearGradient id="bottomBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="50%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+    <filter id="glow1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="40" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      .title { font-family: 'Inter', sans-serif; font-weight: 700; }
+      .tagline { font-family: 'Inter', sans-serif; font-weight: 300; }
+      .code { font-family: 'JetBrains Mono', monospace; }
+      .badge { font-family: 'Inter', sans-serif; font-weight: 500; }
+      .feature { font-family: 'Inter', sans-serif; font-weight: 400; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="627" fill="url(#bg)"/>
+  
+  <!-- Grid pattern -->
+  <g opacity="0.03">
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#6366f1" stroke-width="1"/>
+    </pattern>
+    <rect width="1200" height="627" fill="url(#grid)"/>
+  </g>
+  
+  <!-- Glow effects -->
+  <ellipse cx="1000" cy="100" rx="300" ry="300" fill="#6366f1" opacity="0.08" filter="url(#glow1)"/>
+  <ellipse cx="100" cy="550" rx="200" ry="200" fill="#10b981" opacity="0.06" filter="url(#glow1)"/>
+  
+  <!-- Flow diagram -->
+  <g transform="translate(60, 140)">
+    <!-- YAML node -->
+    <rect x="0" y="0" width="180" height="48" rx="8" fill="#fbbf2410" stroke="#fbbf2466" stroke-width="1"/>
+    <text x="90" y="30" text-anchor="middle" fill="#fcd34d" font-size="14" class="code">playbook.yaml</text>
+    
+    <!-- Connector 1 -->
+    <line x1="90" y1="48" x2="90" y2="78" stroke="#6366f180" stroke-width="2"/>
+    <polygon points="84,73 90,83 96,73" fill="#6366f180"/>
+    
+    <!-- Engine node -->
+    <rect x="0" y="88" width="180" height="48" rx="8" fill="#10b98110" stroke="#10b98166" stroke-width="1"/>
+    <text x="90" y="118" text-anchor="middle" fill="#6ee7b7" font-size="14" class="code">PlaybookEngine</text>
+    
+    <!-- Connector 2 -->
+    <line x1="90" y1="136" x2="90" y2="166" stroke="#6366f180" stroke-width="2"/>
+    <polygon points="84,161 90,171 96,161" fill="#6366f180"/>
+    
+    <!-- Skills node -->
+    <rect x="0" y="176" width="180" height="48" rx="8" fill="#6366f110" stroke="#6366f14d" stroke-width="1"/>
+    <text x="90" y="206" text-anchor="middle" fill="#a5b4fc" font-size="14" class="code">Skills[]</text>
+    
+    <!-- Connector 3 -->
+    <line x1="90" y1="224" x2="90" y2="254" stroke="#6366f180" stroke-width="2"/>
+    <polygon points="84,249 90,259 96,249" fill="#6366f180"/>
+    
+    <!-- Trace node -->
+    <rect x="0" y="264" width="180" height="48" rx="8" fill="#ec489910" stroke="#ec489966" stroke-width="1"/>
+    <text x="90" y="294" text-anchor="middle" fill="#f9a8d4" font-size="14" class="code">ExecutionTrace</text>
+  </g>
+  
+  <!-- Main content -->
+  <g transform="translate(320, 140)">
+    <!-- Badge -->
+    <rect x="0" y="0" width="120" height="30" rx="15" fill="#6366f126" stroke="#6366f14d" stroke-width="1"/>
+    <text x="60" y="20" text-anchor="middle" fill="#a5b4fc" font-size="11" letter-spacing="1" class="badge">OPEN SOURCE</text>
+    
+    <!-- Title -->
+    <text x="0" y="90" fill="#ffffff" font-size="64" class="title">Agentic</text>
+    <text x="0" y="160" fill="url(#titleGradient)" font-size="64" class="title">Playbooks</text>
+    
+    <!-- Tagline -->
+    <text x="0" y="210" fill="#94a3b8" font-size="24" class="tagline">Deterministic AI workflows you can</text>
+    <text x="410" y="210" fill="#f1f5f9" font-size="24" font-weight="500" class="tagline">trust.</text>
+    <text x="0" y="245" fill="#94a3b8" font-size="24" class="tagline">Full audit trails. Built for compliance.</text>
+    
+    <!-- Features -->
+    <g transform="translate(0, 290)">
+      <!-- Feature 1 -->
+      <circle cx="10" cy="10" r="10" fill="#10b98133"/>
+      <text x="10" y="14" text-anchor="middle" fill="#10b981" font-size="11">✓</text>
+      <text x="30" y="15" fill="#64748b" font-size="14" class="feature">YAML-defined</text>
+      
+      <!-- Feature 2 -->
+      <circle cx="160" cy="10" r="10" fill="#10b98133"/>
+      <text x="160" y="14" text-anchor="middle" fill="#10b981" font-size="11">✓</text>
+      <text x="180" y="15" fill="#64748b" font-size="14" class="feature">Fully traced</text>
+      
+      <!-- Feature 3 -->
+      <circle cx="300" cy="10" r="10" fill="#10b98133"/>
+      <text x="300" y="14" text-anchor="middle" fill="#10b981" font-size="11">✓</text>
+      <text x="320" y="15" fill="#64748b" font-size="14" class="feature">Governance-first</text>
+    </g>
+  </g>
+  
+  <!-- GitHub hint -->
+  <g transform="translate(900, 580)">
+    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" fill="#475569" transform="scale(0.9)"/>
+    <text x="30" y="17" fill="#475569" font-size="13" class="feature">github.com/JustinNarracott/agentic-playbooks</text>
+  </g>
+  
+  <!-- Bottom bar -->
+  <rect x="0" y="623" width="1200" height="4" fill="url(#bottomBar)"/>
+</svg>
