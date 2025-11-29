@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # ===================
+  # CORE DEV ENVIRONMENT
+  # ===================
+  
+  dev-workspace:
+    build: ./workspace
+    container_name: playbooks-workspace
+    volumes:
+      - ../:/workspace
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    ports:
+      - "8888:8888"
+    networks:
+      - dev-network
+    depends_on:
+      - postgres-dev
+      - redis-dev
+
+  # ===================
+  # DATA LAYER
+  # ===================
+  
+  postgres-dev:
+    image: postgres:15
+    container_name: playbooks-postgres
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devpass
+      POSTGRES_DB: playbooks_dev
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5434:5432"
+    networks:
+      - dev-network
+
+  redis-dev:
+    image: redis:7-alpine
+    container_name: playbooks-redis
+    ports:
+      - "6380:6379"
+    networks:
+      - dev-network
+
+  # ===================
+  # WORKFLOW ENGINE (for testing playbooks)
+  # ===================
+  
+  n8n-dev:
+    image: n8nio/n8n:latest
+    container_name: playbooks-n8n
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=dev
+      - N8N_BASIC_AUTH_PASSWORD=devpass
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres-dev
+      - DB_POSTGRESDB_DATABASE=n8n_dev
+      - DB_POSTGRESDB_USER=dev
+      - DB_POSTGRESDB_PASSWORD=devpass
+    ports:
+      - "5679:5678"
+    networks:
+      - dev-network
+    depends_on:
+      - postgres-dev
+
+networks:
+  dev-network:
+    driver: bridge
+
+volumes:
+  postgres-dev-data:

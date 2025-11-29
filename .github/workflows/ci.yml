@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: dev
+          POSTGRES_PASSWORD: devpass
+          POSTGRES_DB: playbooks_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          
+      - name: Run linters
+        run: |
+          black --check .
+          ruff check .
+          
+      - name: Run type checking
+        run: mypy src/
+        
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://dev:devpass@localhost:5432/playbooks_test
+        run: pytest --cov=src --cov-report=xml
+        
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
