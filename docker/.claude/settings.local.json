@@ -12,7 +12,8 @@
       "Bash(gh pr checks:*)",
       "Bash(gh run view:*)",
       "Bash(git commit:*)",
-      "Bash(gh pr view:*)"
+      "Bash(gh pr view:*)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []

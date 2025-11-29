@@ -1,5 +1,12 @@
 """Playbook engine - core execution logic."""
 
+from .engine import (
+    ExecutionContext,
+    ExecutionTrace,
+    PlaybookEngine,
+    PlaybookExecutionError,
+    StepTrace,
+)
 from .loader import PlaybookLoader, PlaybookLoadError
 from .models import (
     DecisionBranch,
@@ -21,4 +28,9 @@ __all__ = [
     "DecisionStep",
     "DecisionBranch",
     "StepType",
+    "PlaybookEngine",
+    "PlaybookExecutionError",
+    "ExecutionContext",
+    "ExecutionTrace",
+    "StepTrace",
 ]
