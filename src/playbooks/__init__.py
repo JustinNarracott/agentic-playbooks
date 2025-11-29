@@ -21,6 +21,7 @@ from .models import (
     StepType,
 )
 from .tracer import ExecutionTrace, ExecutionTracer, StepTrace
+from .visualizer import PlaybookVisualizer
 
 __all__ = [
     "PlaybookLoader",
@@ -44,4 +45,5 @@ __all__ = [
     "ExecutionTracer",
     "StepTrace",
     "CheckpointManager",
+    "PlaybookVisualizer",
 ]
